@@ -103,6 +103,11 @@ classify the tweets according to their overall sentiment and check the accuracy 
 4. Evaluating Model Performance
 5. Improving Model Performance
 
+
+# IMPLEMENTATION PREREQUISITES
+
+## TWITTER APPLICATION
+
 1.	In order to create an application, we will need Twitter login ID. 
 2.	Sign in at [Twitter Developers](https://developer.twitter.com/en)
 

@@ -4,7 +4,7 @@
 > access_token_secret<-"SkmKZAzQIN1AqNa9GigYjbids9JkoA3zcILQa5ziBVlfl"
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
->install.packages("twitteR")
+`install.packages("twitteR")`
 WARNING: Rtools is required to build R packages but is not currently installed. Please download and install the appropriate version of Rtools before proceeding:
 
 https://cran.rstudio.com/bin/windows/Rtools/

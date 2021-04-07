@@ -3,9 +3,8 @@ api_secret<- "add_your_key_value_you recieved_in_email"
 access_token<-"add_your_key_value_you recieved_in_email"
 access_token_secret<-"add_your_key_value_you recieved_in_email"
 
-`install.packages("twitteR")`
-<details><summary>Read More</summary>
- <p>
+install.packages("twitteR")
+
 WARNING: Rtools is required to build R packages but is not currently installed. Please download and install the appropriate version of Rtools before proceeding:
 
 https://cran.rstudio.com/bin/windows/Rtools/

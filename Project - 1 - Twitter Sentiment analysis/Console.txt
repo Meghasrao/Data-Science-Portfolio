@@ -1,0 +1,809 @@
+> setup_twitter_oauth(api_key,api_secret,access_token,access_token_secret)
+[1] "Using direct authentication"
+> posText<-read.csv(Positive-word.csv,header=FALSE,stringsAsFactors=FALSE)
+Error in read.table(file = file, header = header, sep = sep, quote = quote,  : 
+  object 'Positive' not found
+> getwd()
+[1] "E:/Megha/R_workspace"
+> posText<-read.csv(Positive-word,header=FALSE,stringsAsFactors=FALSE)
+Error in read.table(file = file, header = header, sep = sep, quote = quote,  : 
+  object 'Positive' not found
+> posText<-read.csv(Positive-word,header=FALSE,stringsAsFactors=FALSE)
+Error in read.table(file = file, header = header, sep = sep, quote = quote,  : 
+  object 'Positive' not found
+> 
+> posText<-read.csv("Positive-word",header=FALSE,stringsAsFactors=FALSE)
+Error in file(file, "rt") : cannot open the connection
+In addition: Warning message:
+In file(file, "rt") :
+  cannot open file 'Positive-word': No such file or directory
+> posText<-read.csv("Positive-word.csv",header=FALSE,stringsAsFactors=FALSE)
+> str(posText)
+'data.frame':	2006 obs. of  1 variable:
+ $ V1: chr  "a+" "abound" "abounds" "abundance" ...
+> negText<-read.csv("Negative-word.csv",header=FALSE,stringsAsFactors=FALSE)
+> str(negText)
+'data.frame':	4783 obs. of  1 variable:
+ $ V1: chr  "2-faced" "2-faces" "abnormal" "abolish" ...
+> posText<-posText$V1
+> posText$V1
+Error in posText$V1 : $ operator is invalid for atomic vectors
+> negText<-negText$V1
+> posText<-unlist(lapply(posText, function(x){str_split(x,\n")}))
+Error: unexpected input in "posText<-unlist(lapply(posText, function(x){str_split(x,\"
+> posText<-unlist(lapply(posText, function(x){ str_split(x,\n")}))
+Error: unexpected input in "posText<-unlist(lapply(posText, function(x){ str_split(x,\"
+> posText_split<-unlist(lapply(posText, function(x){str_split(x,\n")}))
+Error: unexpected input in "posText_split<-unlist(lapply(posText, function(x){str_split(x,\"
+> posText<-unlist(lapply(posText, function(x){strsplit(x,\n")}))
+Error: unexpected input in "posText<-unlist(lapply(posText, function(x){strsplit(x,\"
+> posText<-unlist(lapply(posText, function(x){strsplit(x,"\n")}))
+> negText<-unlist(lapply(negText, function(x){ str_split(x,\n")}))
+Error: unexpected input in "negText<-unlist(lapply(negText, function(x){ str_split(x,\"
+> negText<-unlist(lapply(negText, function(x){ str_split(x,"\n")}))
+> pos.word=c(posText,"upgrade")
+> neg.words=c(negText,"wtf","wait","waiting","epicfail","mechanical")
+> neg.word=c(negText,"wtf","wait","waiting","epicfail","mechanical")
+> remove(neg.words)
+> Amazon_tweets=searchTwitter('@Amazon',n=1000)
+> Flipkart_tweets=searchTwitter('@Flipkart',n=1000)
+> Myntra_tweets=searchTwitter('@Myntra',n=1000)
+> Amazon_txt=sapply(Amazon_tweets,function(t) t$getText())
+> Flipkart_text=sapply(Flipkart_tweets,function(t) t$getText())
+> Myntra_text=sapply(Myntra_tweets,function(t) t$getText())
+> noof_tweets=c(length(Amazon_txt),length(Flipkart_txt),length(Myntra_txt))
+Error: object 'Flipkart_txt' not found
+> noof_tweets=c(length(Amazon_txt),length(Flipkart_text),length(Myntra_text))
+> Shopping_site<- c(Amazon_txt,Flipkart_text,Myntra_text)
+>   sent.score= sapply(sentences,function(sentences,pos.word,neg.word){
++     sentences=gsub("[[:punct:]]","",sentence)
++     sentences=gsub("[[:cntrl:]]","",sentence)
++     sentences=gsub("//d+","",sentence)
++     tryTolower=function(x){
++       y=NA
++       try_error=tryCatch(tolower(x),error=function(e) e)
++       if(!inherits(try_error,"error")){
++          y=tolower(x)
++         return(y)
++     sentence=sapply(sentence,tryTolower)
++     word.list = str_split(sentence, "\\s+")
++     words = unlist(word.list)
++     pos.matches = match(words, pos.words)
++     neg.matches = match(words, neg.words)
++     pos.matches = !is.na(pos.matches)
++     neg.matches = !is.na(neg.matches)
++     score = sum(pos.matches) - sum(neg.matches)
++     return(score)
++   }, pos.words, neg.words )
+Error: unexpected ',' in:
+"    return(score)
+  },"
+>   }, pos.word, neg.word )
+Error: unexpected '}' in "  }"
+>   }, pos.word, neg.word{
+Error: unexpected '}' in "  }"
+>   }, pos.word, neg.word, .progress=.progress)
+Error: unexpected '}' in "  }"
+> score.sentiment= function(sentences,pos.word,neg.word){
++   sent.score= sapply(sentences,function(sentences,pos.word,neg.word){
++     sentences=gsub("[[:punct:]]","",sentence)
++     sentences=gsub("[[:cntrl:]]","",sentence)
++     sentences=gsub("//d+","",sentence)
++     tryTolower=function(x){
++       y=NA
++       try_error=tryCatch(tolower(x),error=function(e) e)
++       if(!inherits(try_error,"error")){
++          y=tolower(x)
++         }
++         return(y)
++       }
++     sentence=sapply(sentence,tryTolower)
++     word.list = str_split(sentence, "\\s+")
++     words = unlist(word.list)
++     pos.matches = match(words, pos.words)
++     neg.matches = match(words, neg.words)
++     pos.matches = !is.na(pos.matches)
++     pos.matches = !is.na(pos.matches)
++     neg.matches = !is.na(neg.matches)
++     score = sum(pos.matches) - sum(neg.matches)
++     return(score)
++   }, pos.word, neg.word)
++   sent.scores.datafrm = data.frame(text=sentences, score=sent.scores)
++   return(sent.scores.datafrm)
++ }
+> score.sentiment= function(sentences,pos.word,neg.word){
++  sent.score= sapply(sentences,function(sentences,pos.word,neg.word){
++     #Removing Punctuations
++     sentence=gsub("[[:punct:]]","",sentence)
++     #Removing Control Characters
++     sentence=gsub("[[:cntrl:]]","",sentence)
++     #Removing digits
++     sentence=gsub("//d+","",sentence)
++     
++     #Error handling function when trying to convert lower case
++     tryTolower=function(x){
++       y=NA
++       try_error=tryCatch(tolower(x),error=function(e) e)
++       if(!inherits(try_error,"error")){
++          y=tolower(x)
++         }
++       
++         return(y)
++       }
++     sentence=sapply(sentence,tryTolower)
++     
++     #split sentence into words with str_split 
++     word.list = str_split(sentence, "\\s+")
++     words = unlist(word.list)
++     
++     #Compare words to the dictionaries of positive & negative terms
++     pos.matches = match(words, pos.words)
++     neg.matches = match(words, neg.words)
++     
++     # get the position of the matched term or NA
++     # we just want a TRUE/FALSE
++     pos.matches = !is.na(pos.matches)
++     neg.matches = !is.na(neg.matches)
++     
++     # final score
++     score = sum(pos.matches) - sum(neg.matches)
++     return(score)
++   }, pos.word, neg.word)
++   
++   # data frame with sent.scores for each sentence
++   sent.scores.datafrm = data.frame(text=sentences, score=sent.scores)
++   return(sent.scores.datafrm)
++ }
+
+> sent.scores = score.sentiment(Shopping_site, pos.words,neg.words)
+Error in data.frame(text = sentences, score = sent.scores) : 
+  object 'sent.scores' not found
+> score.sentiment= function(sentences,pos.words,neg.words){
++   sent.scores= sapply(sentences,function(sentence,pos.words,neg.words){
++     #Removing Punctuations
++     sentences=gsub("[[:punct:]]","",sentence)
++     #Removing Control Characters
++     sentences=gsub("[[:cntrl:]]","",sentence)
++     #Removing digits
++     sentences=gsub("//d+","",sentence)
++     
++     tryTolower=function(x){
++       y=NA
++       try_error=tryCatch(tolower(x),error=function(e) e)
++       if(!inherits(try_error,"error")){
++          y=tolower(x)
++         }
++         return(y)
++       }
++     sentence=sapply(sentence,tryTolower)
++     word.list = str_split(sentence, "\\s+")
++     words = unlist(word.list)
++     pos.matches = match(words, pos.words)
++     neg.matches = match(words, neg.words)
++     
++     pos.matches = !is.na(pos.matches)
++     neg.matches = !is.na(neg.matches)
++     
++     score = sum(pos.matches) - sum(neg.matches)
++     return(score)
++   }, pos.words, neg.words)
++   
++   sent.scores.datafrm = data.frame(text=sentences, score=sent.scores)
++   return(sent.scores.datafrm)
++ }
+> sent.scores = score.sentiment(Shopping_site, pos.words,neg.words)
+> score.sentiment= function(sentences,pos.words,neg.words){
++   sent.scores= sapply(sentences,function(sentence,pos.word,neg.words){
++     #Removing Punctuations
++     sentences=gsub("[[:punct:]]","",sentence)
++     #Removing Control Characters
++     sentences=gsub("[[:cntrl:]]","",sentence)
++     #Removing digits
++     sentences=gsub("//d+","",sentence)
++     
++     #Error handling function when trying to convert lower case
++     tryTolower=function(x){
++       y=NA
++       try_error=tryCatch(tolower(x),error=function(e) e)
++       if(!inherits(try_error,"error")){
++          y=tolower(x)
++         }
++       
++         return(y)
++       }
++     sentence=sapply(sentence,tryTolower)
++     
++     #split sentence into words with str_split 
++     word.list = str_split(sentence, "\\s+")
++     words = unlist(word.list)
++     
++     #Compare words to the dictionaries of positive & negative terms
++     pos.matches = match(words, pos.words)
++     neg.matches = match(words, neg.words)
++     
++     # get the position of the matched term or NA
++     # we just want a TRUE/FALSE
++     pos.matches = !is.na(pos.matches)
++     neg.matches = !is.na(neg.matches)
++     View(sent.scores)
+> sent.scores$Shopping_site = factor(rep(c("Amazon", "Flipkart","Myntra"), noof_tweets))
+> sent.scores$positive <- as.numeric(sent.scores$score >0)
+> sent.scores$negative <- as.numeric(sent.scores$score <0)
+> sent.scores$neutral <- as.numeric(sent.scores$score==0)
+> Amazon_Shopping_Site <- subset(sent.scores, sent.scores$Shopping_Site=="Amazon")
+> Amazon_Shopping_Site <- subset(sent.scores, sent.scores$Shopping_Site=="Amazon")
+> View(Amazon_Shopping_Site)
+> Amazon_Shopping_Site <- subset(sent.scores, sent.scores$Shopping_site=="Amazon")
+> Flipkart_Shopping_Site <- subset(sent.scores,sent.scores$Shopping_site=="Flipkart")
+> Myntra_Shopping_Site <- subset(sent.scores,sent.scores$Shopping_site=="Myntra")
+> Amazon_Shopping_Site$polarity <- ifelse(Amazon_Shopping_Site$score >0,"positive",ifelse(Amazon_Shopping_Site$score < 0,"negative",ifelse(Amazon_Shopping_Site$score==0,"Neutral",0)))
+> Flipkart_Shopping_Site$polarity <- ifelse(Flipkart_Shopping_Site$score >0,"positive",ifelse(Flipkart_Shopping_Site$score < 0,"negative",ifelse(Flipkart_Shopping_Site$score==0,"Neutral",0)))
+> Myntra_Shopping_Site$polarity <- ifelse(Myntra_Shopping_Site$score >0,"positive",ifelse(Myntra_Shopping_Site$score < 0,"negative",ifelse(Myntra_Shopping_Site$score==0,"Neutral",0)))
+> qplot(factor(polarity), data=Amazon_Shopping_Site, geom="bar", fill=factor(polarity))+xlab("Polarity Categories")+ylab("Frequency")+ggtitle("Customer Sentiments - Amazon Shopping Site")
+> qplot(factor(score), data=Amazon_Shopping_Site, geom="bar", fill=factor(score))+xlab("Sentiment Score")+ylab("Frequency")+ggtitle("Customer Sentiment Scores - Amazon Shopping Site")
+> qplot(factor(polarity), data=Flipkart_Shopping_Site, geom="bar",fill=factor(polarity))
+>        +xlab("Polarity Categories")+ylab("Frequency")
+Error in +xlab("Polarity Categories") : 
+  invalid argument to unary operator
+>        + ggtitle(" Customer Sentiments - Flipkart Shopping Site")
+Error in +ggtitle(" Customer Sentiments - Flipkart Shopping Site") : 
+  invalid argument to unary operator
+> qplot(factor(polarity), data=Flipkart_Shopping_Site, geom="bar",fill=factor(polarity))
+>        +xlab("Polarity Categories")+ylab("Frequency")
+Error in +xlab("Polarity Categories") : 
+  invalid argument to unary operator
+>        +ggtitle(" Customer Sentiments - Flipkart Shopping Site")
+Error in +ggtitle(" Customer Sentiments - Flipkart Shopping Site") : 
+  invalid argument to unary operator
+>        qplot(factor(polarity), data=Flipkart_Shopping_Site, geom="bar",fill=factor(polarity))+xlab("Polarity Categories")+ylab("Frequency")+ggtitle(" Customer Sentiments - Flipkart Shopping Site")
+>        qplot(factor(score), data=Flipkart_Shopping_Site, geom="bar",fill=factor(score))+xlab("Sentiment Score")+ylab("Frequency")+ggtitle("Customer Sentiment Scores - Flipkart Shopping Site")
+>        qplot(factor(polarity), data=Myntra_Shopping_Site, geom="bar",fill=factor(polarity))+xlab("Polarity Categories")+ylab("Frequency")+ggtitle("Customer Sentiments - Myntra Shopping Site") 
+>        qplot(factor(score), data=Myntra_Shopping_Site, geom="bar",fill=factor(score))+xlab("Sentiment Score")+ylab("Frequency")+ggtitle("Customer Sentiment Scores - Myntra Shopping Site ")
+
+> datafrm = ddply(sent.scores, c("Shopping_site"),summarise,pos_count=sum( positive ),neg_count=sum( negative ),neu_count=sum(neutral))
+> datafrm$total_count = datafrm$pos_count +datafrm$neg_count + datafrm$neu_count
+> datafrm$pos_percent_score = round( 100*datafrm$pos_count/datafrm$total_count )
+> 
+> datafrm$neg_percent_score = round( 100*datafrm$neg_count/datafrm$total_count )
+> 
+> datafrm$neu_percent_score = round( 100*datafrm$neu_count/datafrm$total_count )
+> View(datafrm)
+> attach(datafrm)
+The following object is masked _by_ .GlobalEnv:
+
+    Shopping_site
+
+> 
+> pie.chart.lbls <-paste(datafrm$Shopping_Site,datafrm$pos_percent_score)
+> 
+> pie.chart.lbls <- paste(pie.chart.lbls,"percent",sep="")
+> 
+> pie(pos_percent_score, labels = pie.chart.lbls, col = rainbow(length(pie.chart.lbls)), 
++       main = "Positive Comparative Analysis - Shopping Site")
+> attach(datafrm)
+The following object is masked _by_ .GlobalEnv:
+
+    Shopping_site
+
+The following objects are masked from datafrm (pos = 3):
+
+    neg_count, neg_percent_score, neu_count, neu_percent_score, pos_count, pos_percent_score, Shopping_site, total_count
+
+> 
+> pie.chart.lbls <-paste(datafrm$Shopping_Site,datafrm$pos_percent_score)
+> 
+> pie.chart.lbls <- paste(pie.chart.lbls,"percent",sep=" ")
+> 
+> pie(pos_percent_score, labels = pie.chart.lbls, col = rainbow(length(pie.chart.lbls)), 
++       main = "Positive Comparative Analysis - Shopping Site")
+> pie.chart.lbls <-paste(datafrm$Shopping_Site,datafrm$neg_percent_score)
+> 
+> pie.chart.lbls <- paste(pie.chart.lbls,"percent",sep="")
+> 
+> pie(neg_percent_score, labels = pie.chart.lbls, col = 
++       rainbow(length(pie.chart.lbls)), main = " Negative 
++ Comparative Analysis - Shopping Site")
+> pie.chart.lbls <-paste(datafrm$Shopping_Site,datafrm$neg_percent_score)
+> 
+> pie.chart.lbls <- paste(pie.chart.lbls,"percent",sep=" ")
+> 
+> pie(neg_percent_score, labels = pie.chart.lbls, col = 
++       rainbow(length(pie.chart.lbls)), main = " Negative 
++ Comparative Analysis - Shopping Site")
+> pie.chart.lbls <-paste(datafrm$Shopping_Site,datafrm$neu_percent_score)
+> 
+> pie.chart.lbls <- paste(pie.chart.lbls,"percent",sep="")
+> 
+> pie(neu_percent_score, labels = pie.chart.lbls, col = 
++       rainbow(length(pie.chart.lbls)), main = "Neutral Comparative 
++ Analysis - Shopping Site")       
+> pie.chart.lbls <-paste(datafrm$Shopping_Site,datafrm$neu_percent_score)
+> 
+> pie.chart.lbls <- paste(pie.chart.lbls,"percent",sep=" ")
+> 
+> pie(neu_percent_score, labels = pie.chart.lbls, col = 
++       rainbow(length(pie.chart.lbls)), main = "Neutral Comparative 
++ Analysis - Shopping Site")  
++     # final score
++     score = sum(pos.matches) - sum(neg.matches)
++     return(score)
++   }, pos.words, neg.words)
++   
++   # data frame with sent.scores for each sentence
++   sent.scores.datafrm = data.frame(text=sentences, score=sent.scores)
++   return(sent.scores.datafrm)
++ }
+> sent.scores = score.sentiment(Shopping_site, pos.words,neg.words)
+ > View(sent.scores)
+> sent.scores$Shopping_site = factor(rep(c("Amazon", "Flipkart","Myntra"), noof_tweets))
+> sent.scores$positive <- as.numeric(sent.scores$score >0)
+> sent.scores$negative <- as.numeric(sent.scores$score <0)
+> sent.scores$neutral <- as.numeric(sent.scores$score==0)
+> Amazon_Shopping_Site <- subset(sent.scores, sent.scores$Shopping_Site=="Amazon")
+> Amazon_Shopping_Site <- subset(sent.scores, sent.scores$Shopping_Site=="Amazon")
+> View(Amazon_Shopping_Site)
+> Amazon_Shopping_Site <- subset(sent.scores, sent.scores$Shopping_site=="Amazon")
+> Flipkart_Shopping_Site <- subset(sent.scores,sent.scores$Shopping_site=="Flipkart")
+> Myntra_Shopping_Site <- subset(sent.scores,sent.scores$Shopping_site=="Myntra")
+> Amazon_Shopping_Site$polarity <- ifelse(Amazon_Shopping_Site$score >0,"positive",ifelse(Amazon_Shopping_Site$score < 0,"negative",ifelse(Amazon_Shopping_Site$score==0,"Neutral",0)))
+> Flipkart_Shopping_Site$polarity <- ifelse(Flipkart_Shopping_Site$score >0,"positive",ifelse(Flipkart_Shopping_Site$score < 0,"negative",ifelse(Flipkart_Shopping_Site$score==0,"Neutral",0)))
+> Myntra_Shopping_Site$polarity <- ifelse(Myntra_Shopping_Site$score >0,"positive",ifelse(Myntra_Shopping_Site$score < 0,"negative",ifelse(Myntra_Shopping_Site$score==0,"Neutral",0)))
+> qplot(factor(polarity), data=Amazon_Shopping_Site, geom="bar", fill=factor(polarity))+xlab("Polarity Categories")+ylab("Frequency")+ggtitle("Customer Sentiments - Amazon Shopping Site")
+> qplot(factor(score), data=Amazon_Shopping_Site, geom="bar", fill=factor(score))+xlab("Sentiment Score")+ylab("Frequency")+ggtitle("Customer Sentiment Scores - Amazon Shopping Site")
+> qplot(factor(polarity), data=Flipkart_Shopping_Site, geom="bar",fill=factor(polarity))
+>        +xlab("Polarity Categories")+ylab("Frequency")
+Error in +xlab("Polarity Categories") : 
+  invalid argument to unary operator
+>        + ggtitle(" Customer Sentiments - Flipkart Shopping Site")
+Error in +ggtitle(" Customer Sentiments - Flipkart Shopping Site") : 
+  invalid argument to unary operator
+> qplot(factor(polarity), data=Flipkart_Shopping_Site, geom="bar",fill=factor(polarity))
+>        +xlab("Polarity Categories")+ylab("Frequency")
+Error in +xlab("Polarity Categories") : 
+  invalid argument to unary operator
+>        +ggtitle(" Customer Sentiments - Flipkart Shopping Site")
+Error in +ggtitle(" Customer Sentiments - Flipkart Shopping Site") : 
+  invalid argument to unary operator
+>        qplot(factor(polarity), data=Flipkart_Shopping_Site, geom="bar",fill=factor(polarity))+xlab("Polarity Categories")+ylab("Frequency")+ggtitle(" Customer Sentiments - Flipkart Shopping Site")
+>        qplot(factor(score), data=Flipkart_Shopping_Site, geom="bar",fill=factor(score))+xlab("Sentiment Score")+ylab("Frequency")+ggtitle("Customer Sentiment Scores - Flipkart Shopping Site")
+>        qplot(factor(polarity), data=Myntra_Shopping_Site, geom="bar",fill=factor(polarity))+xlab("Polarity Categories")+ylab("Frequency")+ggtitle("Customer Sentiments - Myntra Shopping Site") 
+>        qplot(factor(score), data=Myntra_Shopping_Site, geom="bar",fill=factor(score))+xlab("Sentiment Score")+ylab("Frequency")+ggtitle("Customer Sentiment Scores - Myntra Shopping Site ")
+> datafrm = ddply(sent.scores, c("Shopping_Site"),summarise,pos_count=sum( positive ),neg_count=sum( negative ),neu_count=sum(neutral))
+Error in FUN(X[[i]], ...) : object 'Shopping_Site' not found
+> datafrm = ddply(sent.scores, c("Shopping_site"),summarise,pos_count=sum( positive ),neg_count=sum( negative ),neu_count=sum(neutral))
+> datafrm$total_count = datafrm$pos_count +datafrm$neg_count + datafrm$neu_count
+> datafrm$pos_percent_score = round( 100*datafrm$pos_count/datafrm$total_count )
+> 
+> datafrm$neg_percent_score = round( 100*datafrm$neg_count/datafrm$total_count )
+> 
+> datafrm$neu_percent_score = round( 100*datafrm$neu_count/datafrm$total_count )
+> View(datafrm)
+> attach(datafrm)
+The following object is masked _by_ .GlobalEnv:
+
+    Shopping_site
+
+> 
+> pie.chart.lbls <-paste(datafrm$Shopping_Site,datafrm$pos_percent_score)
+> 
+> pie.chart.lbls <- paste(pie.chart.lbls,"percent",sep="")
+> 
+> pie(pos_percent_score, labels = pie.chart.lbls, col = rainbow(length(pie.chart.lbls)), 
++       main = "Positive Comparative Analysis - Shopping Site")
+> attach(datafrm)
+The following object is masked _by_ .GlobalEnv:
+
+    Shopping_site
+
+The following objects are masked from datafrm (pos = 3):
+
+    neg_count, neg_percent_score, neu_count, neu_percent_score, pos_count, pos_percent_score, Shopping_site, total_count
+
+> 
+> pie.chart.lbls <-paste(datafrm$Shopping_Site,datafrm$pos_percent_score)
+> 
+> pie.chart.lbls <- paste(pie.chart.lbls,"percent",sep=" ")
+> 
+> pie(pos_percent_score, labels = pie.chart.lbls, col = rainbow(length(pie.chart.lbls)), 
++       main = "Positive Comparative Analysis - Shopping Site")
+> pie.chart.lbls <-paste(datafrm$Shopping_Site,datafrm$neg_percent_score)
+> 
+> pie.chart.lbls <- paste(pie.chart.lbls,"percent",sep="")
+> 
+> pie(neg_percent_score, labels = pie.chart.lbls, col = 
++       rainbow(length(pie.chart.lbls)), main = " Negative 
++ Comparative Analysis - Shopping Site")
+> pie.chart.lbls <-paste(datafrm$Shopping_Site,datafrm$neg_percent_score)
+> 
+> pie.chart.lbls <- paste(pie.chart.lbls,"percent",sep=" ")
+> 
+> pie(neg_percent_score, labels = pie.chart.lbls, col = 
++       rainbow(length(pie.chart.lbls)), main = " Negative 
++ Comparative Analysis - Shopping Site")
+> pie.chart.lbls <-paste(datafrm$Shopping_Site,datafrm$neu_percent_score)
+> 
+> pie.chart.lbls <- paste(pie.chart.lbls,"percent",sep="")
+> 
+> pie(neu_percent_score, labels = pie.chart.lbls, col = 
++       rainbow(length(pie.chart.lbls)), main = "Neutral Comparative 
++ Analysis - Shopping Site")       
+> pie.chart.lbls <-paste(datafrm$Shopping_Site,datafrm$neu_percent_score)
+> 
+> pie.chart.lbls <- paste(pie.chart.lbls,"percent",sep=" ")
+> 
+> pie(neu_percent_score, labels = pie.chart.lbls, col = 
++       rainbow(length(pie.chart.lbls)), main = "Neutral Comparative 
++ Analysis - Shopping Site")  
+> write.table(Amazon_Shopping_Site,"E:/Megha/R_workspace/Amazon_Shopping_Site.csv", append=T, row.names=F, col.names=T,sep=",",)
+Warning message:
+In write.table(Amazon_Shopping_Site, "E:/Megha/R_workspace/Amazon_Shopping_Site.csv",  :
+  appending column names to file
+> Amazon_Shopping_Site_csv <-read.csv("E:/Megha/R_workspace/Amazon_Shopping_Site.csv", header = TRUE, encoding = "UCS-2LE")
+> View(Amazon_Shopping_Site)
+> View(Amazon_Shopping_Site_csv)
+
+> df<- read.csv("Amazon_Shopping_Site_classif1.csv", stringsAsFactors = FALSE)
+> head(df)
+                                                                                                                                           text
+1   I just listed: 'Hot Wheels 2019 Team Transport Car Culsture Series '66 Super Nova and Retro Rig Black Hole Limited… https://t.co/3yiAjL4bk1
+2             5x7ft Light Grey Wood Wall Photography Backdrop Gray Wooden Floor Photo Backg... https://t.co/UgNF32NneM <U+6765><U+81EA> @amazon
+3  RT @meskue: If you get the @amazon gift guide, keep an eye out for some raucous raccoons!  #TrashPandas  @EskueLisa @Gamewright @RedRookGam…
+4       RT @goldmedalmind: The Young Champion's Mind: How to Think, Train, and Thrive Like an Elite Athl... https://t.co/NC1764WWxL via @amazon
+5 RT @judehaste_write: #humorous #escapism @judehaste_write \nDon't Shout it Out!: A Comical, Romantic Romp that leads all the way to Downi...…
+6             7x5 ft Red Christmas Photography Backdrops Customized Snowflake Photo Studio ... https://t.co/O7u2omifEh <U+6765><U+81EA> @amazon
+     class
+1 positive
+2  Neutral
+3  Neutral
+4 positive
+5 positive
+6  Neutral
+> set.seed(1)
+> df <- df[sample(nrow(df)), ]
+> df <- df[sample(nrow(df)), ]
+> head(df)
+                                                                                                                                                                                                                                                                                                                                                                                      text
+18                                                                                                                                                                                                                                            And then there was the 2017 plan to give Reservation 13 to @Amazon. @DMPEDDC told @nickburgerdc that it didn’t have… https://t.co/jyOoRO0odk
+1546                                                                                                                                                                                                                                                                                               @amazon please ship whole carton of burnol to Daniel aka ga@ndu https://t.co/pCZJv39J2V
+959                                                                                                                                                                                                                                            RT @SolarPrepper: An Old Man And His Axe: A Prepper fiction book of survival in an EMP grid down https://t.co/D9irbfzWg4 via @amazon #SHTF…
+701                                                                                                                                                                                                      RT @AmazonEnLucha: <U+203C><U+FE0F>@Amazon desafía la decisión de la corte de Carolina del Sur de que debe hasta 12.5M $ en impuestos por las ventas\n\n<U+0001F1FA><U+0001F1F8>…
+711  <U+3010><U+3068><U+3042><U+308B>if<U+3011><U+96D1><U+8AC7><U+FF1F><U+26A0><U+30AF><U+30E9><U+30ED><U+30EF><U+3067><U+306F><U+3042><U+308A><U+307E><U+305B><U+3093><U+3002><U+4F5C><U+696D>@Amazon<U+30DE><U+30C3><U+30C8><U+8A66><U+3057><U+4E2D>  ##<U+3068><U+3042><U+308B>IF  #<U+30DF><U+30E9><U+30C6><U+30A3><U+30D6> <U+3067><U+914D><U+4FE1><U+4E2D>!  https://t.co/2IFjucXzry
+1882                                                                                                                                                                                                                                                     Spezielle chinesische Nahrung Lotuswurzelstärke 1 Pfund (454 Gramm) süßer Ges... https://t.co/QhdpEjhAXl <U+6765><U+81EA> @amazon
+       class
+18   Neutral
+1546 Neutral
+959  Neutral
+701  Neutral
+711  Neutral
+1882 Neutral
+> str(df)
+'data.frame':	2045 obs. of  2 variables:
+ $ text : chr  "And then there was the 2017 plan to give Reservation 13 to @Amazon. @DMPEDDC told @nickburgerdc that it didn’t "| __truncated__ "@amazon please ship whole carton of burnol to Daniel aka ga@ndu https://t.co/pCZJv39J2V" "RT @SolarPrepper: An Old Man And His Axe: A Prepper fiction book of survival in an EMP grid down https://t.co/D"| __truncated__ "RT @AmazonEnLucha: <U+203C><U+FE0F>@Amazon desafía la decisión de la corte de Carolina del Sur de que debe hast"| __truncated__ ...
+ $ class: chr  "Neutral" "Neutral" "Neutral" "Neutral" ...
+> df$class <- as.factor(df$class)      
+> corpus <- VCorpus(VectorSource(df$text))      
+> corpus
+<<VCorpus>>
+Metadata:  corpus specific: 0, document level (indexed): 0
+Content:  documents: 2045
+> inspect(corpus[1:3])
+<<VCorpus>>
+Metadata:  corpus specific: 0, document level (indexed): 0
+Content:  documents: 3
+
+[[1]]
+<<PlainTextDocument>>
+Metadata:  7
+Content:  chars: 140
+
+[[2]]
+<<PlainTextDocument>>
+Metadata:  7
+Content:  chars: 87
+
+[[3]]
+<<PlainTextDocument>>
+Metadata:  7
+Content:  chars: 139
+
+> corpus.clean <- corpus %>% tm_map(content_transformer(tolower)) %>%tm_map(removePunctuation) %>% tm_map(removeNumbers) %>%tm_map(removeWords, stopwords(kind="en")) %>% tm_map(stripWhitespace)
+> dtm <- DocumentTermMatrix(corpus.clean)
+> inspect(dtm[40:50, 10:15])
+<<DocumentTermMatrix (documents: 11, terms: 6)>>
+Non-/sparse entries: 0/66
+Sparsity           : 100%
+Maximal term length: 6
+Weighting          : term frequency (tf)
+Sample             :
+    Terms
+Docs “work” «mon aaaaa aaj aajtak aaya
+  40      0    0     0   0      0    0
+  41      0    0     0   0      0    0
+  42      0    0     0   0      0    0
+  43      0    0     0   0      0    0
+  44      0    0     0   0      0    0
+  45      0    0     0   0      0    0
+  46      0    0     0   0      0    0
+  47      0    0     0   0      0    0
+  48      0    0     0   0      0    0
+  49      0    0     0   0      0    0
+  50      0    0     0   0      0    0
+> df.train <- df[1:700,]
+> df.test <- df[701:1000,]
+> dtm.train <- dtm[1:700,]
+> dtm.test <- dtm[701:1000,]
+> corpus.clean.train <- corpus.clean[1:700]
+> corpus.clean.test <- corpus.clean[701:1000]
+> dim(dtm.train)
+[1]  700 4530
+> fivefreq <- findFreqTerms(dtm.train, 5)   
+> length((fivefreq))
+[1] 296
+> dtm.train.nb <- DocumentTermMatrix(corpus.clean.train, control=list(dictionary = fivefreq))
+> dim(dtm.train.nb)
+[1] 700 296
+> dtm.test.nb <- DocumentTermMatrix(corpus.clean.test, control=list(dictionary = fivefreq))
+> dim(dtm.train.nb)
+[1] 700 296
+> convert_count <- function(x) {
++   y <- ifelse(x > 0, 1,0)
++   y <- factor(y, levels=c(0,1), labels=c("No", "Yes"))
++   y
++ }
+> trainNB <- apply(dtm.train.nb, 2, convert_count)
+> testNB <- apply(dtm.test.nb, 2, convert_count)  
+> system.time( classifier <- naiveBayes(trainNB, df.train$class,laplace = 1) )
+   user  system elapsed 
+   0.06    0.00    0.06 
+> system.time( pred <- predict(classifier, newdata=testNB) )
+   user  system elapsed 
+   1.25    0.06    1.31 
+> table("Predictions"= pred, "Actual" = df.test$class )
+           Actual
+Predictions       0   1 negative Neutral polarity positive
+              2   0   0        0       0        0        0
+   0          0   0   0        0       0        0        0
+   1          0   0   0        0       0        0        0
+   negative   0   0   0       10       2        0        2
+   Neutral    2   1   3       17     182        0       51
+   polarity   0   0   0        0       0        0        0
+   positive   1   0   0        0       9        0       18
+> conf.mat <- confusionMatrix(pred, df.test$class)
+Error in `[.default`(data, , pos) : subscript out of bounds
+> conf.mat
+Error: object 'conf.mat' not found
+> df.train <- df[1:500,]
+> df.test <- df[501:1000,]
+> dtm.train <- dtm[1:500,]
+> dtm.test <- dtm[501:1000,]
+> corpus.clean.train <- corpus.clean[1:500]
+> corpus.clean.test <- corpus.clean[501:1000]
+> dim(dtm.train)
+[1]  500 4530
+> fivefreq <- findFreqTerms(dtm.train, 5)   
+> length((fivefreq))
+[1] 174
+> dtm.train.nb <- DocumentTermMatrix(corpus.clean.train, control=list(dictionary = fivefreq))
+> dim(dtm.train.nb)
+[1] 500 174
+> dtm.test.nb <- DocumentTermMatrix(corpus.clean.test, control=list(dictionary = fivefreq))
+> dim(dtm.train.nb)
+[1] 500 174
+> convert_count <- function(x) {
++   y <- ifelse(x > 0, 1,0)
++   y <- factor(y, levels=c(0,1), labels=c("No", "Yes"))
++   y
++ }
+> trainNB <- apply(dtm.train.nb, 2, convert_count)
+> 
+> testNB <- apply(dtm.test.nb, 2, convert_count)  
+> system.time( classifier <- naiveBayes(trainNB, df.train$class,laplace = 1) )
+   user  system elapsed 
+   0.01    0.01    0.03 
+> system.time( pred <- predict(classifier, newdata=testNB) )
+   user  system elapsed 
+   1.24    0.00    1.27 
+> table("Predictions"= pred, "Actual" = df.test$class )
+           Actual
+Predictions       0   1 negative Neutral polarity positive
+              3   0   0        0       1        0        0
+   0          0   0   0        0       0        0        0
+   1          0   0   0        0       0        0        0
+   negative   0   0   0       16       5        0        2
+   Neutral    5   2   4       36     291        0       94
+   polarity   0   0   0        0       0        0        0
+   positive   1   0   0        4       9        0       27
+> conf.mat <- confusionMatrix(pred, df.test$class)
+Error in `[.default`(data, , pos) : subscript out of bounds
+> df<- read.csv("Amazon_Shopping_Site_classif1.csv", stringsAsFactors = FALSE)
+> head(df)
+                                                                                                                                           text
+1   I just listed: 'Hot Wheels 2019 Team Transport Car Culsture Series '66 Super Nova and Retro Rig Black Hole Limited… https://t.co/3yiAjL4bk1
+2             5x7ft Light Grey Wood Wall Photography Backdrop Gray Wooden Floor Photo Backg... https://t.co/UgNF32NneM <U+6765><U+81EA> @amazon
+3  RT @meskue: If you get the @amazon gift guide, keep an eye out for some raucous raccoons!  #TrashPandas  @EskueLisa @Gamewright @RedRookGam…
+4       RT @goldmedalmind: The Young Champion's Mind: How to Think, Train, and Thrive Like an Elite Athl... https://t.co/NC1764WWxL via @amazon
+5 RT @judehaste_write: #humorous #escapism @judehaste_write \nDon't Shout it Out!: A Comical, Romantic Romp that leads all the way to Downi...…
+6             7x5 ft Red Christmas Photography Backdrops Customized Snowflake Photo Studio ... https://t.co/O7u2omifEh <U+6765><U+81EA> @amazon
+     class
+1 positive
+2  Neutral
+3  Neutral
+4 positive
+5 positive
+6  Neutral
+> 
+> ####Randomize the dataset and convert the 'class' variable from character to factor.
+> set.seed(1)
+> 
+> df <- df[sample(nrow(df)), ]
+> 
+> df <- df[sample(nrow(df)), ]
+> 
+> head(df)
+                                                                                                                                                 text
+1062              @unprofdzecoles @amazon Par contre, pour Nathan il y a de nombreux retours pour dire que la qualité de la reliure laisse à désirer.
+1940 RT @LunchLadiesBC: Just saw this on Amazon: Wolf Hunt 3 (The Werewolf Chasers) by Jeff Strand\n\nhttps://t.co/EhTkPTOBIL \n\nvia @amazon @JeffS…
+1153                      Check out this Amazon deal: Samsung SSD 860 EVO 1TB 2.5 Inch SATA III Int... by Samsung https://t.co/2P9iNxkxff via @amazon
+1611           #Aladdin: the Songs (Original Film Soundtrack) [Vinyl LP] Walt Disney Records ... https://t.co/z1Dr2WtMai via… https://t.co/GZKgzmeLUQ
+1193                                                          @wickedoffarwest @amazon Asda satiyordu bir ara,ama bu kadar keyifli olmazdi herhalde..
+1837  RT @kmproducts2017: Boba Pearl Milk Tea Lovers T-Shirt Bubble Tea Designs By KnM\n#boba #bubbletea #milktea #tea #tealovers \n\nhttps://t.co/J…
+        class
+1062 negative
+1940  Neutral
+1153  Neutral
+1611  Neutral
+1193  Neutral
+1837  Neutral
+> 
+> str(df)
+'data.frame':	1978 obs. of  2 variables:
+ $ text : chr  "@unprofdzecoles @amazon Par contre, pour Nathan il y a de nombreux retours pour dire que la qualité de la reliu"| __truncated__ "RT @LunchLadiesBC: Just saw this on Amazon: Wolf Hunt 3 (The Werewolf Chasers) by Jeff Strand\n\nhttps://t.co/E"| __truncated__ "Check out this Amazon deal: Samsung SSD 860 EVO 1TB 2.5 Inch SATA III Int... by Samsung https://t.co/2P9iNxkxff via @amazon" "#Aladdin: the Songs (Original Film Soundtrack) [Vinyl LP] Walt Disney Records ... https://t.co/z1Dr2WtMai via… "| __truncated__ ...
+ $ class: chr  "negative" "Neutral" "Neutral" "Neutral" ...
+> 
+> df$class <- as.factor(df$class)      
+> 
+> #### Bag of Words Tokenization       
+> 
+> corpus <- VCorpus(VectorSource(df$text))      
+> corpus
+<<VCorpus>>
+Metadata:  corpus specific: 0, document level (indexed): 0
+Content:  documents: 1978
+> inspect(corpus[1:3])
+<<VCorpus>>
+Metadata:  corpus specific: 0, document level (indexed): 0
+Content:  documents: 3
+
+[[1]]
+<<PlainTextDocument>>
+Metadata:  7
+Content:  chars: 131
+
+[[2]]
+<<PlainTextDocument>>
+Metadata:  7
+Content:  chars: 140
+
+[[3]]
+<<PlainTextDocument>>
+Metadata:  7
+Content:  chars: 123
+
+> 
+> ######data Clean up
+> 
+> corpus.clean <- corpus %>% tm_map(content_transformer(tolower)) %>%tm_map(removePunctuation) %>% tm_map(removeNumbers) %>%tm_map(removeWords, stopwords(kind="en")) %>% tm_map(stripWhitespace)
+> 
+> ######Matrix representation of Bag of Words: The Document Term Matrix (DTM)
+> dtm <- DocumentTermMatrix(corpus.clean)
+> 
+> inspect(dtm[40:50, 10:15])
+<<DocumentTermMatrix (documents: 11, terms: 6)>>
+Non-/sparse entries: 0/66
+Sparsity           : 100%
+Maximal term length: 7
+Weighting          : term frequency (tf)
+Sample             :
+    Terms
+Docs aaaaa aaj aajtak aaya ab… abalone
+  40     0   0      0    0   0       0
+  41     0   0      0    0   0       0
+  42     0   0      0    0   0       0
+  43     0   0      0    0   0       0
+  44     0   0      0    0   0       0
+  45     0   0      0    0   0       0
+  46     0   0      0    0   0       0
+  47     0   0      0    0   0       0
+  48     0   0      0    0   0       0
+  49     0   0      0    0   0       0
+  50     0   0      0    0   0       0
+> 
+> 
+> 
+> df.train <- df[1:500,]
+> 
+> df.test <- df[501:1000,]
+> 
+> dtm.train <- dtm[1:500,]
+> 
+> dtm.test <- dtm[501:1000,]
+> 
+> corpus.clean.train <- corpus.clean[1:500]
+> 
+> corpus.clean.test <- corpus.clean[501:1000]
+> 
+> #############Feature Selection:
+> dim(dtm.train)
+[1]  500 4495
+> 
+> fivefreq <- findFreqTerms(dtm.train, 5)   
+> length((fivefreq))
+[1] 172
+> 
+> dtm.train.nb <- DocumentTermMatrix(corpus.clean.train, control=list(dictionary = fivefreq))
+> dim(dtm.train.nb)
+[1] 500 172
+> 
+> dtm.test.nb <- DocumentTermMatrix(corpus.clean.test, control=list(dictionary = fivefreq))
+> dim(dtm.train.nb)
+[1] 500 172
+> 
+> #####Naive Bayes - a. Function to convert the word frequencies to yes (presence) and no (absence)labels: 
+> 
+> convert_count <- function(x) {
++   y <- ifelse(x > 0, 1,0)
++   y <- factor(y, levels=c(0,1), labels=c("No", "Yes"))
++   y
++ }
+> ######b. Applying the convert_count function to get the final training and testing DTMs:
+> trainNB <- apply(dtm.train.nb, 2, convert_count)
+> 
+> testNB <- apply(dtm.test.nb, 2, convert_count)  
+> 
+> ########iii. Training the Naive Bayes Model
+> system.time( classifier <- naiveBayes(trainNB, df.train$class,laplace = 1) )
+   user  system elapsed 
+   0.05    0.00    0.05 
+> 
+> #########iv. Testing the Predictions
+> system.time( pred <- predict(classifier, newdata=testNB) )
+   user  system elapsed 
+   1.22    0.00    1.21 
+> table("Predictions"= pred, "Actual" = df.test$class )
+           Actual
+Predictions negative Neutral positive
+   negative        8       5        0
+   Neutral        34     297       67
+   positive        9      17       63
+> conf.mat <- confusionMatrix(pred, df.test$class)
+> conf.mat
+Confusion Matrix and Statistics
+
+          Reference
+Prediction negative Neutral positive
+  negative        8       5        0
+  Neutral        34     297       67
+  positive        9      17       63
+
+Overall Statistics
+                                         
+               Accuracy : 0.736          
+                 95% CI : (0.695, 0.7741)
+    No Information Rate : 0.638          
+    P-Value [Acc > NIR] : 1.942e-06      
+                                         
+                  Kappa : 0.4044         
+                                         
+ Mcnemar's Test P-Value : 5.007e-13      
+
+Statistics by Class:
+
+                     Class: negative Class: Neutral Class: positive
+Sensitivity                   0.1569         0.9310          0.4846
+Specificity                   0.9889         0.4420          0.9297
+Pos Pred Value                0.6154         0.7462          0.7079
+Neg Pred Value                0.9117         0.7843          0.8370
+Prevalence                    0.1020         0.6380          0.2600
+Detection Rate                0.0160         0.5940          0.1260
+Detection Prevalence          0.0260         0.7960          0.1780
+Balanced Accuracy             0.5729         0.6865          0.7072

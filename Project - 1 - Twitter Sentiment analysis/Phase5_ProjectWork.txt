@@ -1,0 +1,191 @@
+Part II : Naïve Bayes
+
+i. Data Preprocessing
+
+We will first load all the required libraries (packages).
+
+a. Writing and Reading the Data as ‘Amazon_Shopping_Site’ 
+
+write.table(Amazon_Shopping_Site,"your R_Workspace directory/Amazon_Shopping_Site.csv", append=T, row.names=F, col.names=T,sep=",",)
+
+Amazon_Shopping_Site_csv <-read.csv("your R_Workspace directory/Amazon_Shopping_Site.csv", header = TRUE, encoding = "UCS-2LE")
+
+View(Amazon_Shopping_Site_csv)
+
+** Take the snap of output.
+
+**
+Note: Create a .csv file with only one column, class (Open Amazon_Shopping_Site.csv and create a new .csv file and save it as “Amazon_Shopping_Site_classif1.csv” file; open this file in excel and delete all the columns except polarity; now, change the column name polarity to class and select the filter to delete all the rows other than positive, negative, and neutral tweets and save it.) 
+
+** take again the snap with two columns
+
+Now, read the new file, "Amazon_Shopping_Site_classif1.csv".
+
+df<- read.csv("Amazon_Shopping_Site_classif1.csv", stringsAsFactors = FALSE)
+
+head(df)
+
+** Take the snap of output
+
+b. Randomize the dataset and convert the 'class' variable from character to factor.
+
+set.seed(1)
+
+df <- df[sample(nrow(df)), ]
+
+df <- df[sample(nrow(df)), ]
+
+head(df)
+
+str(df)
+
+df$class <- as.factor(df$class)
+
+c. Bag of Words Tokenization
+
+In this approach, we represent each word in a document as a token (or feature) and each document as a vector of features. In addition, for simplicity, we disregard word order and focus only on the number of occurrences of each word, which means that we represent each document as a multi-set ‘bag’ of words.
+
+We first prepare a corpus of all the documents in the dataframe.
+
+corpus <- VCorpus(VectorSource(df$text))
+
+corpus
+
+** Take the Plot snap as it is and paste just below the above code
+
+inspect(corpus[1:3])
+
+c. Data Cleanup
+
+We clean up the corpus by eliminating numbers, punctuation, and white space and by converting to lowercase. In addition, we discard common stop words, such as “his”, “our”, “hadn’t”, couldn’t“, etc. 
+
+corpus.clean <- corpus %>% tm_map(content_transformer(tolower)) %>% tm_map(removePunctuation) %>% tm_map(removeNumbers) %>% tm_map(removeWords, stopwords(kind="en")) %>% tm_map(stripWhitespace)
+
+d. Matrix representation of Bag of Words: The Document Term Matrix (DTM)
+
+We represent the bag of words tokens with a document term matrix (DTM). The rows of the DTM correspond to the documents in the collection, the columns correspond to the terms, and its elements are the term frequencies. 
+
+dtm <- DocumentTermMatrix(corpus.clean)
+
+inspect(dtm[40:50, 10:15])
+
+** Take the Plot snap as it is and paste just below the above code
+
+ii. Partitioning the Data
+
+We create 70:30 partitions of the dataframe, corpus, and DTM for training and 
+testing purposes.
+
+df.train <- df[1:1200,]
+
+df.test <- df[1201:1554,]
+
+dtm.train <- dtm[1:1200,]
+
+dtm.test <- dtm[1201:1554,]
+
+corpus.clean.train <- corpus.clean[1:1200]
+
+corpus.clean.test <- corpus.clean[1201:1554]
+
+Feature Selection:
+dim(dtm.train)
+
+** Take the Plot snap as it is and paste just below the above code
+
+The DTM contains many features, but not all of them are useful for classification. We reduce the number of features by ignoring the words that appear in less than five reviews. To do this, we use the ‘findFreqTerms’ function to indentify frequent words, and then we restrict the DTM to use only the frequent words using the ‘dictionary’ option.
+
+fivefreq <- findFreqTerms(dtm.train, 5)
+
+length((fivefreq))
+
+** Take the Plot snap as it is and paste just below the above code
+
+dtm.train.nb <- DocumentTermMatrix(corpus.clean.train, control=list(dictionary = fivefreq))
+
+dim(dtm.train.nb)
+
+** Take the Plot snap as it is and paste just below the above code
+
+dtm.test.nb <- DocumentTermMatrix(corpus.clean.test, control=list(dictionary = fivefreq))
+
+dim(dtm.train.nb)
+
+** Take the Plot snap as it is and paste just below the above code
+
+The Naive Bayes algorithm
+
+The Naive Bayes text classification algorithm is essentially an application of Bayes theorem 
+(with a strong independence assumption) to documents and  classes. In this method, the term 
+frequencies are replaced by Boolean presence/absence features. The logic behind this is that 
+for sentiment classification, word occurrence matters more than word frequency.
+
+a. Function to convert the word frequencies to yes (presence) and no (absence)labels: 
+
+convert_count <- function(x) {
+	y <- ifelse(x > 0, 1,0)
+	y <- factor(y, levels=c(0,1), labels=c("No", "Yes"))
+	y
+}
+
+b. Applying the convert_count function to get the final training and testing DTMs:
+
+trainNB <- apply(dtm.train.nb, 2, convert_count)
+
+testNB <- apply(dtm.test.nb, 2, convert_count)
+
+iii. Training the Naive Bayes Model
+
+To train the model, we use the Naive Bayes function from the ‘e1071’ package. Since Naive Bayes evaluates the products of probabilities, we need some way of assigning nonzero probabilities to words that do not appear in the sample.
+
+Train the classifier.
+
+system.time( classifier <- naiveBayes(trainNB, df.train$class,laplace = 1) )
+
+** Take the Plot snap as it is and paste just below the above code
+
+iv. Testing the Predictions
+
+Use the NB classifier we built to make predictions on the test set:
+
+system.time( pred <- predict(classifier, newdata=testNB) )
+
+** Take the Plot snap as it is and paste just below the above code
+
+Create a truth table by tabulating the predicted class labels with the actual class labels: 
+
+table("Predictions"= pred, "Actual" = df.test$class )
+
+** Take the Plot snap as it is and paste just below the above code
+
+v. Confusion Matrix
+
+Prepare the confusion matrix:
+
+conf.mat <- confusionMatrix(pred, df.test$class)
+
+conf.mat
+
+** Take the Plot snap as it is and paste just below the above code
+
+
+** In separate page
+
+Conclusion
+
+In the first part, we analysed tweets for competing e-commerce brands and characterised the 
+sentiment score for each tweet as positive, negative, and neutral. With this polarity data, we 
+have created a variety of charts to enable a comparative study of brand value, in terms of 
+the customer’s response on Twitter. Our analysis shows that Myntra is the most-liked brand 
+out of the three brands (Amazon, Myntra, and Flipkart) we analyzed for this project . 
+Customer tweets for Myntra were mostly of positive sentiment as opposed to Flipkart, 
+which had tweets mostly of negative sentiment and Amazon, which had tweets mostly of 
+neutral sentiment.
+
+In the second part, we trained the Naïve Bayes algorithm, using the tweet and polarity data 
+from part one of the sentiment analysis for the prediction of new tweets. Our results show 
+an accuracy of 73.73%; higher accuracy can be achieved with more training on a larger 
+dataset. We also calculated sensitivity, specificity, and the P-Value of test data through 
+confusion matrix for better insights. 
+
+**************************************End***************************************************

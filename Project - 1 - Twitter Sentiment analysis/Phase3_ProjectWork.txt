@@ -1,0 +1,170 @@
+iv. Extracting Tweets with hasgtag:
+
+To demonstrate sentiment analysis, we analyzed tweets relating to Amazon, Flipkart and Myntra. 
+
+Amazon_tweets=searchTwitter('@Amazon',n=1000)
+similarly do for Flipkart and Myntra.
+
+v. Processing Tweets:
+a. Convert the tweets into text format:
+Amazon_txt=sapply(Amazon_tweets,function(t) t$getText())
+similarly do for Flipkart and Myntra
+
+b. Calculate the number of tweets for each e-commerce company:
+noof_tweets=c(length(Amazon_txt),length(Flipkart_txt),length(Myntra_txt))
+
+c. Combining the text of all these e-commerce companies:
+Shopping_Site<-c(Amazon_txt,Flipkart_txt,Myntra_txt)
+
+vi. Sentiment Analysis application code:
+the code below will show how sentiment analysis is written and executed. before we proceed with sentiment analysis, a function needs to be defined, which will calculate the sentiment score.
+
+parameters of function:
+sentences -- vector of text to score
+pos.words -- vector of words of positive sentiment
+neg.words -- vector of words of negative sentiment
+sent.score -- is the simple array with sapply()
+# -- acts as comments which is not processed by R.
+score.sentiment=function(sentences, pos.words,neg.words){
+	
+	sent.score=sapply(sentences, function(sentence,pos.words,neg.words){
+		# removing punctuations
+		sentences=gsub("[[:punct:]]","",sentence)
+		# removing control charaters
+		sentences=gsub("[[:cntrl:]]","",sentence)
+		# removing digits
+		sentences=gsub("\\d+","",sentence)
+		# error handling function when trying to convert lower case
+		tryTolower=function(x){
+			y=NA
+			try_error=tryCatch(tolower(x),error=function(e) e)
+			if(!inherits(try_error,"error")){
+				y=tolower(x)
+			}
+			return(y)
+		}
+		sentence=sapply(sentence,tryTolower)
+		# split sentence into words with str_split (stringr package)
+                word.list = str_split(sentence, "\\s+")
+                words = unlist(word.list)
+                # compare words to the dictionaries of positive & negative terms
+                pos.matches = match(words, pos.words)
+                neg.matches = match(words, neg.words)
+                # get the position of the matched term or NA
+                # we just want a TRUE/FALSE
+                pos.matches = !is.na(pos.matches)
+                neg.matches = !is.na(neg.matches)
+                # final score
+                score = sum(pos.matches) - sum(neg.matches)
+                return(score)
+        }, pos.words, neg.words )
+  	# data frame with sent.scores for each sentence
+  	sent.scores.datafrm = data.frame(text=sentences, score=sent.scores)
+  	return(sent.scores.datafrm)
+}
+
+v. Start processing the tweets to calculate the sentiment score.
+
+sent.scores = score.sentiment(Shopping_Site, pos.words,neg.words)
+
+a. Step 1 - Create a variable in the data frame.
+
+sent.scores$Shopping_Site = factor(rep(c("Amazon", "Flipkart","Myntra"), noof_tweets))
+
+b. Step 2 - Calculate positive, negative and neutral sentiments.
+sent.scores$positive <- as.numeric(sent.scores$score >0)
+sent.scores$negative <- as.numeric(sent.scores$score <0)
+sent.scores$neutral <- as.numeric(sent.scores$score==0)
+
+c. Step 3 - Split the data frame into individual datasets for each Shopping Site.
+Amazon_Shopping_Site <- subset(sent.scores, sent.scores$Shopping_Site=="Amazon")
+Flipkart_Shopping_Site <- subset(sent.scores,sent.scores$Shopping_Site=="Flipkart")
+Myntra_Shopping_Site <- subset(sent.scores,sent.scores$Shopping_Site=="Myntra")
+
+d. Step 4 - Create polarity variable for each data frame.
+Amazon_Shopping_Site$polarity <- ifelse(Amazon_Shopping_Site$score >0,"positive",ifelse(Amazon_Shopping_Site$score < 0,"negative",ifelse(Amazon_Shopping_Site$score==0,"Neutral",0)))
+
+Flipkart_Shopping_Site$polarity <- ifelse(Flipkart_Shopping_Site$score >0,"positive",ifelse(Flipkart_Shopping_Site$score < 0,"negative",ifelse(Flipkart_Shopping_Site$score==0,"Neutral",0)))
+
+Myntra_Shopping_Site$polarity <- ifelse(Myntra_Shopping_Site$score >0,"positive",ifelse(Myntra_Shopping_Site$score < 0,"negative",ifelse(Myntra_Shopping_Site$score==0,"Neutral",0)))
+
+vi. Generating Graphs
+
+After the above steps have been executed, we will go ahead and create insightful 
+graphs. The steps below outline the process to create graphs.
+
+Plot 1- Polarity Plot – Customer Sentiments (Amazon)
+
+qplot(factor(polarity), data=Amazon_Shopping_Site, geom="bar", 
+fill=factor(polarity))+xlab("Polarity Categories") + 
+ylab("Frequency") + ggtitle("Customer Sentiments - Amazon 
+Shopping Site")
+
+** Take the Plot snap as it is and paste just below the above code and write the following explaination.
+
+The bar graph above depicts polarity if we closely analyze the graph. It reveals that out 
+of 1,000 Twitter users, 100 users have commented in a negative way while 660 users 
+are neutral. However, 240 users are pretty positive about Amazon.
+
+Plot 2- Customer Sentiment Scores (Amazon Shopping Site)
+
+qplot(factor(score), data=Amazon_Shopping_Site, geom="bar", fill=factor(score))+xlab("Sentiment Score") + ylab("Frequency") + ggtitle("Customer Sentiment Scores - Amazon Shopping Site")
+
+** Take the Plot snap as it is and paste just below the above code and write the following explaination.
+
+The bar graph above depicts a Twitter user’s sentiment score, the negative score 
+denoted by the (-) symbol, indicates the unhappiness of users with Amazon, and the 
+positive score denotes that users are happy with Amazon. Zero represents that Twitter 
+users are neutral.
+
+Plot 3 - Polarity Plot – Customer Sentiments (Flipkart)
+
+qplot(factor(polarity), data=Flipkart_Shopping_Site, geom="bar", 
+fill=factor(polarity))+xlab("Polarity Categories") + 
+ylab("Frequency") + ggtitle(" Customer Sentiments - Flipkart 
+Shopping Site ")
+
+** Take the Plot snap as it is and paste just below the above code and write the following explaination.
+
+The bar graph above represents polarity. In this case, out of the 1,000 Twitter users, 
+240 users have commented negatively, 460 users remain neutral, and 300 users are 
+positive about Flipkart. 
+
+Plot 4 - Customer Sentiment Scores (Flipkart)
+qplot(factor(score), data=Flipkart_Shopping_Site, geom="bar", 
+fill=factor(score))+xlab("Sentiment Score") + ylab("Frequency") 
++ ggtitle("Customer Sentiment Scores - Flipkart Shopping Site")
+
+** Take the Plot snap as it is and paste just below the above code and write the following explaination.
+
+The bar graph above depicts a Twitter user’s sentiment score. The negative score, 
+denoted by the (-) symbol, indicates unhappiness with the Flipkart Shopping Site and 
+the positive score denotes that users are quite happy. The zero here represents that 
+users are neutral.
+
+Plot 5 - Polarity Plot – Customer Sentiments (Myntra)
+qplot(factor(polarity), data=Myntra_Shopping_Site, geom="bar", 
+fill=factor(polarity))+xlab("Polarity Categories") + 
+ylab("Frequency") + ggtitle("Customer Sentiments - Myntra 
+Shopping Site") 
+
+** Take the Plot snap as it is and paste just below the above code and write the following explaination.
+
+The bar graph above represents polarity. In this case, out of the 1,000 Twitter users, 80 
+users have commented negatively, 380 users are neutral, and the remaining 540 users 
+remain positive about the e-commerce company.
+
+Plot 6 - Customer Sentiment Scores (Myntra)
+qplot(factor(score), data=Myntra_Shopping_Site, geom="bar", 
+fill=factor(score))+xlab("Sentiment Score") + ylab("Frequency") 
++ ggtitle("Customer Sentiment Scores - Myntra Shopping Site ")
+
+** Take the Plot snap as it is and paste just below the above code and write the following explaination.
+
+The bar graph above depicts the Twitter user’s sentiment score. The negative score 
+denoted by the (-) symbol indicates the unhappiness of users with the e-commerce 
+company while the positive score denotes that users are quite happy. Zero represents 
+that users are neutral about their opinion.
+
+=============================================================================
+

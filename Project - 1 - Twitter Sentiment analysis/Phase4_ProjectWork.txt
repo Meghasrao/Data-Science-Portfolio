@@ -1,0 +1,75 @@
+vii. Summarizing Scores
+
+The code below will help us to summarize the overall positive, negative, and 
+neutral scores:
+
+> datafrm = ddply(sent.scores, c("Shopping_Site"), 
+summarise,
+pos_count=sum( positive ),
+neg_count=sum( negative ),
+neu_count=sum(neutral))
+
+To put it in another way, we will create the total count by adding the positive, 
+negative, and neutral sums.
+
+> datafrm$total_count = datafrm$pos_count +datafrm$neg_count + datafrm$neu_count
+
+Additionally, we will calculate the positive, negative, and neutral percentages 
+using the code below:
+
+> datafrm$pos_percent_score = round( 100*datafrm$pos_count/datafrm$total_count )
+
+> datafrm$neg_percent_score = round( 100*datafrm$neg_count/datafrm$total_count )
+
+> datafrm$neu_percent_score = round( 100*datafrm$neu_count/datafrm$total_count )
+
+viii. Comparison Charts
+
+Comparison 1 - Positive Comparative Analysis
+Here is the code to create a positive comparison pie chart for these three ecommerce companies:
+
+> attach(datafrm)
+
+> pie.chart.lbls <-paste(datafrm$Shopping_Site,datafrm$pos_percent_score)
+
+> pie.chart.lbls <- paste(pie.chart.lbls,"percent",sep="")
+
+> pie(pos_percent_score, labels = pie.chart.lbls, col = rainbow(length(pie.chart.lbls)), 
+main = "Positive Comparative Analysis - Shopping Site")
+
+** Take the Plot snap as it is and paste just below the above code and write the following explaination.
+
+The pie chart below represents the positive percentage score of these companies:
+
+Comparison 2 - Negative Comparative Analysis
+
+Here is the code to create a negative comparison pie chart for these three ecommerce companies:
+pie.chart.lbls <-paste(datafrm$Shopping_Site,datafrm$neg_percent_score)
+
+pie.chart.lbls <- paste(pie.chart.lbls,"percent",sep="")
+
+pie(neg_percent_score, labels = pie.chart.lbls, col = 
+rainbow(length(pie.chart.lbls)), main = " Negative 
+Comparative Analysis - Shopping Site")
+
+** Take the Plot snap as it is and paste just below the above code and write the following explaination.
+
+The pie chart below represents the negative percentage score of these three 
+companies: 
+
+Comparison 3 - Neutral Comparative Analysis
+
+Here is the code to create a neutral comparison pie chart:
+
+pie.chart.lbls <-paste(datafrm$Shopping_Site,datafrm$neu_percent_score)
+
+pie.chart.lbls <- paste(pie.chart.lbls,"percent",sep="")
+
+pie(neu_percent_score, labels = pie.chart.lbls, col = 
+rainbow(length(pie.chart.lbls)), main = "Neutral Comparative 
+Analysis - Shopping Site")
+
+** Take the Plot snap as it is and paste just below the above code and write the following explaination.
+
+The pie chart below represents the neutral percentage score of these three 
+companies:

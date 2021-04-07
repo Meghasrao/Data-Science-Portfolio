@@ -1,2 +1,5 @@
 # Data-Science-Portfolio
-This includes details about all the projects in my resume
+
+`To view detailed Readme(Overview) of project:`
+
+**Click on each project to view the objective of each project**

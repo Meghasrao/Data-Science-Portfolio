@@ -1,5 +1,3 @@
-Hello Students,
-
 Let's start project activity.
 
 Phase 1:
@@ -14,7 +12,7 @@ Remember: You can expect mail from developers-accounts@twitter.com for verificat
 Once your twitter Developers account will be approved will can expect following type of mail from developer-accounts@twitter.com
 
 Your Twitter developer account application has been approved!
-Thanks for applying for access. We’ve completed our review of your application, and are excited to share that your request has been approved.
+Thanks for applying for access. Weâ€™ve completed our review of your application, and are excited to share that your request has been approved.
  
 Sign in to your developer account to get started.
  
